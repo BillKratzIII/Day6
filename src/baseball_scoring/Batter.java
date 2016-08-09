@@ -1,6 +1,7 @@
 package baseball_scoring;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Batter {
@@ -18,16 +19,8 @@ public class Batter {
 		return battingAverage;
 	}
 
-	public void setBattingAverage(double battingAverage) {
-		this.battingAverage = battingAverage;
-	}
-
 	public double getSluggingPercentage() {
 		return sluggingPercentage;
-	}
-
-	public void setSluggingPercentage(double sluggingPercentage) {
-		this.sluggingPercentage = sluggingPercentage;
 	}
 
 	public String getBatterName() {
@@ -45,16 +38,37 @@ public class Batter {
 	public void getResults(){
 		Scanner sc = new Scanner(System.in);
 		Scanner sn = new Scanner(System.in);
-		int atBats;
+		int atBats=0;
 		System.out.println("How many at bats would you like to enter for " + this.getBatterName() + ":");
-		atBats = sn.nextInt();
-		this.setNumAtBats(atBats);
-		for(int i = 0; i<this.numAtBats; i++){
-			int result;
-			System.out.println("Enter the result of at bat #" + (i+1));
-			result = sc.nextInt();
-			this.atBatResults.add(result);
+		
+		try{
+			atBats = sn.nextInt();
+		}catch(InputMismatchException d){
+			System.out.println("Please enter a valid number greater than 0");
+			getResults();
 		}
+			if (atBats>0){
+				this.setNumAtBats(atBats);
+				for(int i = 0; i<this.numAtBats; i++){
+					int result = 0;
+					System.out.println("Enter the result of at bat #" + (i+1));
+					try{
+					result = sc.nextInt();
+					}catch(InputMismatchException f){
+						System.out.println("Invalid entry, must be number. Please enter 0,1,2,3 or 4. Start over.");
+						Scoring.main(null);
+					}
+					if(isValid(result)){
+						this.atBatResults.add(result);
+					}else{
+						System.out.println("Invalid entry, please enter 0,1,2,3 or 4");
+						i--;
+					}
+				}
+			}else{
+				System.out.println("Not a valid number of at bats");
+				getResults();
+			}
 		
 	}
 	
@@ -74,5 +88,16 @@ public class Batter {
 			totalBases = totalBases + atBatResults.get(i);
 		}
 		this.sluggingPercentage = (((double)totalBases)/((double)this.getNumAtBats()));
+	}
+	
+	public static boolean isValid(int hitValue){
+		boolean isValid = false;
+		int[] validNums = {0,1,2,3,4};
+		for (int i=0; i<validNums.length; i++){	
+			if(hitValue == validNums[i]){
+				isValid = true;
+			}
+		}
+		return isValid;
 	}
 }
